@@ -1,0 +1,11 @@
+Important: The values here:
+COPY target/hire-0.0.1-SNAPSHOT.jar /app/hire-0.0.1-SNAPSHOT.jar
+And here:
+ENTRYPOINT ["java", "-jar", "hire-0.0.1-SNAPSHOT.jar"]
+Are hard-written. It is possible to create a mvn command that would create the dockerfile with parameters
+so when the versions are updated, there is no need to change it in two places: the dockerfile and the
+pom. This is something to consider in the future, but not a priority.
+
+Useful commands:
+To deploy the containers, on the root of all the projects we will use:
+docker-compose up --build

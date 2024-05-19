@@ -1,0 +1,8 @@
+The application will not work locally if it doesn't have a local instance of MongoDB to connect to:
+We can use docker-compose up to deploy an instance of the database and an instance of the app
+
+Another approach is to use docker desktop to create a container with this properties:
+Container name: mongodb
+Host port: 27017
+
+This second approach seems to be easier and faster, so it is recommended for local deployment

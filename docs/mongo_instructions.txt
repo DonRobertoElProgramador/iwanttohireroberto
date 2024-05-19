@@ -1,0 +1,15 @@
+For the moment:
+
+The instance is created using Docker Desktop
+As a port (This may change in the future) the port that has to be specified is 3030
+The same that in application.properties
+If the database doesn't exist, it will create it
+In MongoDB, you don't need to specify the id, it will be automatically generated even if you don't
+set a strategy
+
+Useful commands:
+mongosh -> to access the mongo shell
+show dbs -> to show de databases
+use <Database name> -> to access the database
+show collections -> to show the collections (Corresponding to tables)
+db.<collection name>.find().pretty() -> To show the records inside the collection

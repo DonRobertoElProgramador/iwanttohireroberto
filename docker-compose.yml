@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./Back
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Back/logs:/app/logs
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATA_MONGODB_URI: mongodb://database:27017/hireRobertoDb
+    depends_on:
+      - database
+  database:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_DATABASE: hireRobertoDb
+    ports:
+      - "27017:27017"
+    volumes:
+      - db_data:/data/db
+volumes:
+  db_data:
