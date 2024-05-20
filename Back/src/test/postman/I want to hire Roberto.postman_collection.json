@@ -1,0 +1,55 @@
+{
+	"info": {
+		"_postman_id": "ff151a05-aa5a-4255-970e-6e1c73f75c7e",
+		"name": "I want to hire Roberto",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14655477"
+	},
+	"item": [
+		{
+			"name": "Valid Offer DTO",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"email\":\"email_prueba@prueba.com\",     \r\n        \"companyName\":\"Compañía de prueba\",\r\n        \"userName\":\"Nombre de usuario estándar\",\r\n        \"telephone\":\"+34 222111333\",        \r\n        \"contractType\":\"WAGED\",\r\n        \"technologies\":\"Java, Spring\",\r\n        \"offerDescription\":\"Offer description is optional\",        \r\n        \"workPeriod\": \"MONTHLY\",\r\n        \"onlyOccasionally\": false,        \r\n        \"daysForPeriod\":0,\r\n        \"paymentStructure\":\"PERMONTH\",\r\n        \"minAmount\":0,\r\n        \"maxAmount\":3000,\r\n        \"paymentObservations\":\"You will be paid in peanuts\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/offer",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"offer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/offer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/offer",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"offer"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
