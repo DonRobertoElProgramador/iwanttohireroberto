@@ -3,11 +3,14 @@ pipeline {
     stages {
         stage('Load and Execute External Script') {
             steps {
-                script {
-                    // Load and execute the external Groovy script
-                    def externalScript = load 'jobs/myScript.groovy'
-                    // Optionally, call methods from the loaded script
-                    externalScript.someMethod()
+                dsl {
+                    text('''
+                        job('hello_world_job') {
+                            steps {
+                                shell('echo "Hello, World!"')
+                            }
+                        }
+                    '''.stripIndent())
                 }
             }
         }
