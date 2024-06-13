@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                dir('back') {
+                dir('Back') {
                     script {
                         sh 'mvn clean package'
                     }
@@ -11,13 +11,13 @@ pipeline {
             }
             post {
                 success {
-                    archiveArtifacts artifacts: 'back/target/*.jar', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'Back/target/*.jar', allowEmptyArchive: true
                 }
             }
         }
         stage('Test') {
             steps {
-                dir('back') {
+                dir('Back') {
                     script {
                         sh 'mvn test'
                     }
