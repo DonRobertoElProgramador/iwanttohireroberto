@@ -16,7 +16,7 @@ pipeline {
                         sh "docker-compose -f docker-compose.db.yml exec database mongodump --out /data/db/backup"
                         sh "docker-compose -f docker-compose.db.yml exec database tar -cvzf /data/db/backup.tar.gz /data/db/backup"
                         // Copy dump to host
-                        sh "docker cp $(docker-compose -f docker-compose.db.yml ps -q database):/data/db/backup.tar.gz ./backup.tar.gz"
+                        sh "docker cp \$(docker-compose -f docker-compose.db.yml ps -q database):/data/db/backup.tar.gz ./backup.tar.gz"
                     } catch (Exception e) {
                         // Log the error but do not fail the build
                         echo "Database dump failed: ${e.getMessage()}"
