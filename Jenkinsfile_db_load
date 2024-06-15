@@ -12,7 +12,7 @@ pipeline {
         maven 'Maven'
     }
     parameters {
-        string(name: 'DUMP_FILE_PATH', defaultValue: '', description: 'Path to the database dump file to load')
+        string(name: 'DUMP_FILE_PATH_TO_LOAD', defaultValue: '', description: 'Path to the database dump file to load')
     }
     stages {
         stage('Prepare Backup Filename') {
@@ -76,12 +76,12 @@ pipeline {
             steps {
                 script {
                     // Ensure the dump file path is provided
-                    if (!params.DUMP_FILE_PATH) {
+                    if (!params.DUMP_FILE_PATH_TO_LOAD) {
                         error "No dump file path provided. Please provide a valid path to the database dump file."
                     }
 
                     // Copy the dump file to the database container
-                    sh "docker cp ${params.DUMP_FILE_PATH} \$(docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml ps -q database):/data/db/restore.tar.gz"
+                    sh "docker cp ${params.DUMP_FILE_PATH_TO_LOAD} \$(docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml ps -q database):/data/db/restore.tar.gz"
 
                     // Extract the dump file in the container
                     sh "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database tar -xvzf /data/db/restore.tar.gz -C /data/db"
