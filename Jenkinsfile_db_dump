@@ -39,6 +39,14 @@ pipeline {
                 }
             }
         }
+        stage('Check Container Logs') {
+            steps {
+                script {
+                    def containerLogs = sh(script: "docker-compose -f docker-compose.db.yml logs database", returnStdout: true).trim()
+                    echo "Database container logs: ${containerLogs}"
+                }
+            }
+        }
         stage('Dump MongoDB') {
             steps {
                 script {
@@ -60,6 +68,14 @@ pipeline {
                         echo "Database dump failed: ${e.getMessage()}"
                         currentBuild.result = 'FAILURE'
                     }
+                }
+            }
+        }
+        stage('Check Container Logs') {
+            steps {
+                script {
+                    def containerLogs = sh(script: "docker-compose -f docker-compose.db.yml logs database", returnStdout: true).trim()
+                    echo "Database container logs: ${containerLogs}"
                 }
             }
         }
