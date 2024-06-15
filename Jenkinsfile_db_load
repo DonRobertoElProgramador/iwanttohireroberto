@@ -76,9 +76,12 @@ pipeline {
         stage('Load Database Dump') {
             steps {
                 script {
-                    // Ensure the dump file path is provided
+                    // Ensure the dump file path is provided and is not the same as the saved dump file
                     if (!params.DUMP_FILE_PATH) {
                         error "No dump file path provided. Please provide a valid path to the database dump file."
+                    }
+                    if (params.DUMP_FILE_PATH == "${BACKUP_DIR}/${env.DUMP_FILE}") {
+                        error "The provided dump file path is the same as the dump being saved. Please provide a different dump file path."
                     }
 
                     // Ensure the file exists
