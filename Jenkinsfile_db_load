@@ -40,9 +40,6 @@ pipeline {
             }
         }
         stage('Dump MongoDB') {
-            when {
-                expression { return !params.DUMP_FILE_PATH }
-            }
             steps {
                 script {
                     try {
@@ -80,9 +77,6 @@ pipeline {
             }
         }
         stage('Load Database Dump') {
-            when {
-                expression { return params.DUMP_FILE_PATH }
-            }
             steps {
                 script {
                     // Ensure the dump file path is provided
