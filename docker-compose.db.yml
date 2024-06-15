@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  database:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_DATABASE: hireRobertoDb
+    ports:
+      - "27017:27017"
+    volumes:
+      - db_data:/data/db
+volumes:
+  db_data:
