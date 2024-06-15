@@ -29,10 +29,6 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Ensure the database is stopped before starting it
-                        sh "docker-compose -f docker-compose.db.yml down --remove-orphans"
-                        // Start only the database
-                        sh "docker-compose -f docker-compose.db.yml up -d --remove-orphans"
                         // Dump the database
                         sh "docker-compose -f docker-compose.db.yml exec -T database mongodump --out /data/db/backup"
                         sh "docker-compose -f docker-compose.db.yml exec -T database tar -cvzf /data/db/backup.tar.gz /data/db/backup"
@@ -41,9 +37,6 @@ pipeline {
                     } catch (Exception e) {
                         // Log the error but do not fail the build
                         echo "Database dump failed: ${e.getMessage()}"
-                    } finally {
-                        // Ensure the database is stopped
-                        sh "docker-compose -f docker-compose.db.yml down"
                     }
                 }
             }
@@ -55,14 +48,6 @@ pipeline {
                     sh "mkdir -p ${BACKUP_DIR}"
                     // Copy the dump file to the backup directory with the dynamic name
                     sh "cp ./backup.tar.gz ${BACKUP_DIR}/${env.DUMP_FILE}"
-                }
-            }
-        }
-        stage('Start Database') {
-            steps {
-                script {
-                    // Deploy both app and database
-                    sh "docker-compose -f docker-compose.db.yml up -d --remove-orphans"
                 }
             }
         }
