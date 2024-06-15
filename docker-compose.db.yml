@@ -8,6 +8,6 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - db_data:/data/db
+      - offers_db_data:/data/db
 volumes:
   db_data:

@@ -41,6 +41,9 @@ pipeline {
                     def containerId = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml ps -q database", returnStdout: true).trim()
                     sh "docker cp ${params.DUMP_FILE_PATH} ${containerId}:/data/db/restore.tar.gz"
 
+                    // Create the backup directory
+                    sh "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database mkdir -p /data/db/backup"
+
                     // Print the contents of the directory before extraction for debugging
                     def beforeExtract = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database ls -l /data/db", returnStdout: true).trim()
                     echo "Before extraction: ${beforeExtract}"
