@@ -56,7 +56,7 @@ pipeline {
                     echo "After extraction: ${afterExtract}"
 
                     // Restore the database and capture the output for debugging
-                    def mongorestoreOutput = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database mongorestore --drop /data/db/backup", returnStdout: true).trim()
+                    def mongorestoreOutput = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database mongorestore", returnStdout: true).trim()
                     echo "Mongorestore output: ${mongorestoreOutput}"
                 }
             }
