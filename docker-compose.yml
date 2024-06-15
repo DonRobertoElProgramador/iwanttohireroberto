@@ -22,4 +22,4 @@ services:
     volumes:
       - offers_db_data:/data/db
 volumes:
-  db_data:
+  offers_db_data:
