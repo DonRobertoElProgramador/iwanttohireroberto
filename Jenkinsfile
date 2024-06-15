@@ -5,6 +5,7 @@ pipeline {
     environment {
         // Define the directory where backups will be stored
         BACKUP_DIR = '/var/backups/mongodb'
+        PROJECT_NAME = 'offers' // Set the project name to match the complete pipeline
     }
     tools {
         jdk 'JDK-19'
@@ -34,8 +35,8 @@ pipeline {
                         // Start only the database
                         sh "docker-compose -f docker-compose.db.yml up -d --remove-orphans"
                         // Dump the database
-                        sh "docker-compose -f docker-compose.db.yml exec -T database mongodump --out /data/db/backup"
-                        sh "docker-compose -f docker-compose.db.yml exec -T database tar -cvzf /data/db/backup.tar.gz /data/db/backup"
+                        sh "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database mongodump --out /data/db/backup"
+                        sh "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database tar -cvzf /data/db/backup.tar.gz /data/db/backup"
                         // Copy dump to host
                         sh "docker cp \$(docker-compose -f docker-compose.db.yml ps -q database):/data/db/backup.tar.gz ./backup.tar.gz"
                     } catch (Exception e) {
@@ -95,7 +96,7 @@ pipeline {
             steps {
                 script {
                     // Deploy both app and database
-                    sh "docker-compose up -d --remove-orphans"
+                    sh "docker-compose -p ${env.PROJECT_NAME} up -d --remove-orphans"
                 }
             }
         }

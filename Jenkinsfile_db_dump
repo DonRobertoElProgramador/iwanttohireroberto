@@ -3,8 +3,9 @@ pipeline {
 
     environment {
         // Define the directory where backups will be stored
-        BACKUP_DIR = '/var/lib/jenkins/backups/mongodb'
-        PROJECT_NAME = 'localdeploymentcomplete' // Set the project name to match the complete pipeline
+        BACKUP_DIR = '/var/backups/mongodb'
+        PROJECT_NAME = 'offers' // Set the project name to match the complete pipeline
+        DATABASE_NAME = 'db'
     }
     tools {
         jdk 'JDK-19'
@@ -40,51 +41,21 @@ pipeline {
                 }
             }
         }
-        stage('Verify Project Name') {
-            steps {
-                script {
-                    // Output the project name resources
-                    def projectResources = sh(script: "docker-compose -p ${env.PROJECT_NAME} ps", returnStdout: true).trim()
-                    echo "Docker Compose Project Resources:\n${projectResources}"
-                }
-            }
-        }
-        stage('Test Container Access') {
-            steps {
-                script {
-                    // Test access to the container by listing files
-                    try {
-                        def testAccess = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database ls /", returnStdout: true).trim()
-                        echo "Container access test output: ${testAccess}"
-                    } catch (Exception e) {
-                        echo "Container access test failed: ${e.getMessage()}"
-                        currentBuild.result = 'FAILURE'
-                        return
-                    }
-                }
-            }
-        }
         stage('Dump MongoDB') {
             steps {
                 script {
-                    try {
-                        // Dump the database and capture the output for debugging
-                        def mongodumpOutput = sh(script: """
-                            docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database mongodump --out /data/db/backup
-                        """, returnStdout: true).trim()
-                        echo "Mongodump output: ${mongodumpOutput}"
+                    // Dump the database and capture the output for debugging
+                    def mongodumpOutput = sh(script: """
+                    docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database mongodump --out /data/db/backup
+                    """, returnStdout: true).trim()
+                    echo "Mongodump output: ${mongodumpOutput}"
 
-                        // Compress the dump
-                        def tarOutput = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database tar -cvzf /data/db/backup.tar.gz /data/db/backup", returnStdout: true).trim()
-                        echo "Tar output: ${tarOutput}"
+                    // Compress the dump
+                    def tarOutput = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database tar -cvzf /data/db/backup.tar.gz /data/db/backup", returnStdout: true).trim()
+                    echo "Tar output: ${tarOutput}"
 
-                        // Copy dump to host
-                        sh "docker cp \$(docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml ps -q database):/data/db/backup.tar.gz ./backup.tar.gz"
-                    } catch (Exception e) {
-                        // Log the error but do not fail the build
-                        echo "Database dump failed: ${e.getMessage()}"
-                        currentBuild.result = 'FAILURE'
-                    }
+                    // Copy dump to host
+                    sh "docker cp \$(docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml ps -q database):/data/db/backup.tar.gz ./backup.tar.gz"
                 }
             }
         }
