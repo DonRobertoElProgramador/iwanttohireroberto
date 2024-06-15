@@ -64,9 +64,6 @@ pipeline {
             }
         }
         stage('Copy Dump to Backup Directory') {
-            when {
-                expression { return !params.DUMP_FILE_PATH }
-            }
             steps {
                 script {
                     // Ensure the backup directory exists
