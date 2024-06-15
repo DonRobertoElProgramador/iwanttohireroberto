@@ -1,11 +1,30 @@
 pipeline {
     agent any
 
+
+    environment {
+        // Define the directory where backups will be stored
+        BACKUP_DIR = '/var/backups/mongodb'
+    }
     tools {
         jdk 'JDK-19'
         maven 'Maven'
     }
     stages {
+        stage('Prepare Backup Filename') {
+            steps {
+                script {
+                    // Generate the timestamped filename if DUMP_FILE is not provided
+                    if (!params.DUMP_FILE) {
+                        def timestamp = sh(script: 'date +%Y_%m_%d_%H%M', returnStdout: true).trim()
+                        env.DUMP_FILE = "data_dump_${timestamp}.tar.gz"
+                    } else {
+                        env.DUMP_FILE = params.DUMP_FILE
+                    }
+                    echo "Using dump file name: ${env.DUMP_FILE}"
+                }
+            }
+        }
         stage('Dump MongoDB') {
             steps {
                 script {
@@ -26,6 +45,16 @@ pipeline {
                         // Ensure the database is stopped
                         sh "docker-compose -f docker-compose.db.yml down"
                     }
+                }
+            }
+        }
+        stage('Copy Dump to Backup Directory') {
+            steps {
+                script {
+                    // Ensure the backup directory exists
+                    sh "mkdir -p ${BACKUP_DIR}"
+                    // Copy the dump file to the backup directory with the dynamic name
+                    sh "cp ./backup.tar.gz ${BACKUP_DIR}/${env.DUMP_FILE}"
                 }
             }
         }
