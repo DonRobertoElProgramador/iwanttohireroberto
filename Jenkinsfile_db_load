@@ -2,28 +2,12 @@ pipeline {
     agent any
 
     environment {
-        // Define the directory where backups will be stored
-        BACKUP_DIR = '/var/backups/mongodb'
         PROJECT_NAME = 'offers' // Set the project name to match the complete pipeline
     }
-    tools {
-        jdk 'JDK-19'
-        maven 'Maven'
-    }
     parameters {
-        string(name: 'DUMP_FILE_PATH', defaultValue: '', description: 'Path to the database dump file to load (leave empty to only perform the dump)')
+        string(name: 'DUMP_FILE_PATH', defaultValue: '', description: 'Path to the database dump file to load')
     }
     stages {
-        stage('Prepare Backup Filename') {
-            steps {
-                script {
-                    // Generate the timestamped filename for saving the dump
-                    def timestamp = sh(script: 'date +%Y_%m_%d_%H%M', returnStdout: true).trim()
-                    env.DUMP_FILE = "data_dump_${timestamp}.tar.gz"
-                    echo "Using dump file name: ${env.DUMP_FILE}"
-                }
-            }
-        }
         stage('Ensure Database is Running') {
             steps {
                 script {
@@ -39,49 +23,12 @@ pipeline {
                 }
             }
         }
-        stage('Dump MongoDB') {
-            steps {
-                script {
-                    try {
-                        // Dump the database and capture the output for debugging
-                        def mongodumpOutput = sh(script: """
-                            docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database mongodump --out /data/db/backup
-                        """, returnStdout: true).trim()
-                        echo "Mongodump output: ${mongodumpOutput}"
-
-                        // Compress the dump
-                        def tarOutput = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database tar -cvzf /data/db/backup.tar.gz /data/db/backup", returnStdout: true).trim()
-                        echo "Tar output: ${tarOutput}"
-
-                        // Copy dump to host
-                        sh "docker cp \$(docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml ps -q database):/data/db/backup.tar.gz ./backup.tar.gz"
-                    } catch (Exception e) {
-                        // Log the error but do not fail the build
-                        echo "Database dump failed: ${e.getMessage()}"
-                        currentBuild.result = 'FAILURE'
-                    }
-                }
-            }
-        }
-        stage('Copy Dump to Backup Directory') {
-            steps {
-                script {
-                    // Ensure the backup directory exists
-                    sh "mkdir -p ${BACKUP_DIR}"
-                    // Copy the dump file to the backup directory with the dynamic name
-                    sh "cp ./backup.tar.gz ${BACKUP_DIR}/${env.DUMP_FILE}"
-                }
-            }
-        }
         stage('Load Database Dump') {
             steps {
                 script {
-                    // Ensure the dump file path is provided and is not the same as the saved dump file
+                    // Ensure the dump file path is provided
                     if (!params.DUMP_FILE_PATH) {
                         error "No dump file path provided. Please provide a valid path to the database dump file."
-                    }
-                    if (params.DUMP_FILE_PATH == "${BACKUP_DIR}/${env.DUMP_FILE}") {
-                        error "The provided dump file path is the same as the dump being saved. Please provide a different dump file path."
                     }
 
                     // Ensure the file exists
@@ -91,16 +38,17 @@ pipeline {
                     }
 
                     // Copy the dump file to the database container
-                    sh "docker cp ${params.DUMP_FILE_PATH} \$(docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml ps -q database):/data/db/restore.tar.gz"
+                    def containerId = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml ps -q database", returnStdout: true).trim()
+                    sh "docker cp ${params.DUMP_FILE_PATH} ${containerId}:/data/db/restore.tar.gz"
 
-                    // Print the contents of the directory before extraction
+                    // Print the contents of the directory before extraction for debugging
                     def beforeExtract = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database ls -l /data/db", returnStdout: true).trim()
                     echo "Before extraction: ${beforeExtract}"
 
                     // Extract the dump file in the container
                     sh "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database tar -xvzf /data/db/restore.tar.gz -C /data/db"
 
-                    // Print the contents of the directory after extraction
+                    // Print the contents of the directory after extraction for debugging
                     def afterExtract = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database ls -l /data/db/backup", returnStdout: true).trim()
                     echo "After extraction: ${afterExtract}"
 
