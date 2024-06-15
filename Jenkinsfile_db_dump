@@ -71,7 +71,7 @@ pipeline {
                 }
             }
         }
-        stage('Check Container Logs') {
+        stage('Check Container Logs 2') {
             steps {
                 script {
                     def containerLogs = sh(script: "docker-compose -f docker-compose.db.yml logs database", returnStdout: true).trim()
