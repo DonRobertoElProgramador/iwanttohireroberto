@@ -49,7 +49,7 @@ pipeline {
                     echo "Before extraction: ${beforeExtract}"
 
                     // Extract the dump file in the container
-                    sh "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database tar -xvzf /data/db/restore.tar.gz -C /data/db/backup"
+                    sh "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database tar -xvzf /data/db/restore.tar.gz -C /"
 
                     // Print the contents of the directory after extraction for debugging
                     def afterExtract = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database ls -l /data/db/backup", returnStdout: true).trim()
