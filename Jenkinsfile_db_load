@@ -90,11 +90,20 @@ pipeline {
                     // Copy the dump file to the database container
                     sh "docker cp ${params.DUMP_FILE_PATH} \$(docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml ps -q database):/data/db/restore.tar.gz"
 
+                    // Print the contents of the directory before extraction
+                    def beforeExtract = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database ls -l /data/db", returnStdout: true).trim()
+                    echo "Before extraction: ${beforeExtract}"
+
                     // Extract the dump file in the container
                     sh "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database tar -xvzf /data/db/restore.tar.gz -C /data/db"
 
-                    // Restore the database
-                    sh "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database mongorestore --drop /data/db/backup"
+                    // Print the contents of the directory after extraction
+                    def afterExtract = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database ls -l /data/db/backup", returnStdout: true).trim()
+                    echo "After extraction: ${afterExtract}"
+
+                    // Restore the database and capture the output for debugging
+                    def mongorestoreOutput = sh(script: "docker-compose -p ${env.PROJECT_NAME} -f docker-compose.db.yml exec -T database mongorestore --drop /data/db/backup", returnStdout: true).trim()
+                    echo "Mongorestore output: ${mongorestoreOutput}"
                 }
             }
         }
