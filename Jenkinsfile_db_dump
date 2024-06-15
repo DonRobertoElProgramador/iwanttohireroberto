@@ -1,7 +1,6 @@
 pipeline {
     agent any
 
-
     environment {
         // Define the directory where backups will be stored
         BACKUP_DIR = '/var/backups/mongodb'
@@ -25,12 +24,27 @@ pipeline {
                 }
             }
         }
+        stage('Ensure Database is Running') {
+            steps {
+                script {
+                    // Check if the database container is already running
+                    def containerExists = sh(script: "docker ps -q -f name=database", returnStdout: true).trim()
+                    if (!containerExists) {
+                        echo "Database container is not running. Starting a new one."
+                        // Start the database container if it's not already running
+                        sh "docker-compose -f docker-compose.db.yml up -d --remove-orphans"
+                    } else {
+                        echo "Database container is already running."
+                    }
+                }
+            }
+        }
         stage('Dump MongoDB') {
             steps {
                 script {
                     try {
                         // Dump the database
-                        sh "docker-compose -f docker-compose.db.yml exec -T database mongodump --out /data/db/backup"
+                        sh "docker-compose -f docker-compose.db.yml exec -T database bash -c 'mongodump --out /data/db/backup || (echo \"mongodump failed\" && exit 1)'"
                         sh "docker-compose -f docker-compose.db.yml exec -T database tar -cvzf /data/db/backup.tar.gz /data/db/backup"
                         // Copy dump to host
                         sh "docker cp \$(docker-compose -f docker-compose.db.yml ps -q database):/data/db/backup.tar.gz ./backup.tar.gz"
@@ -52,4 +66,5 @@ pipeline {
             }
         }
     }
-}     
+}
+
