@@ -43,14 +43,22 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Dump the database
-                        sh "docker-compose -f docker-compose.db.yml exec -T database bash -c 'mongodump --out /data/db/backup || (echo \"mongodump failed\" && exit 1)'"
-                        sh "docker-compose -f docker-compose.db.yml exec -T database tar -cvzf /data/db/backup.tar.gz /data/db/backup"
+                        // Dump the database and capture the output for debugging
+                        def mongodumpOutput = sh(script: """
+                            docker-compose -f docker-compose.db.yml exec -T database bash -c 'mongodump --out /data/db/backup && echo "mongodump succeeded" || (echo "mongodump failed" && exit 1)'
+                        """, returnStdout: true).trim()
+                        echo "Mongodump output: ${mongodumpOutput}"
+
+                        // Compress the dump
+                        def tarOutput = sh(script: "docker-compose -f docker-compose.db.yml exec -T database tar -cvzf /data/db/backup.tar.gz /data/db/backup", returnStdout: true).trim()
+                        echo "Tar output: ${tarOutput}"
+
                         // Copy dump to host
                         sh "docker cp \$(docker-compose -f docker-compose.db.yml ps -q database):/data/db/backup.tar.gz ./backup.tar.gz"
                     } catch (Exception e) {
                         // Log the error but do not fail the build
                         echo "Database dump failed: ${e.getMessage()}"
+                        currentBuild.result = 'FAILURE'
                     }
                 }
             }
