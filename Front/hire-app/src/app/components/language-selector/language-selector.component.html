@@ -1,0 +1,14 @@
+<div class="text-container">
+  <p *ngIf="hoveredFlag">{{ hoveredFlag }}</p>
+</div>
+
+<div class="image-container">
+  <img src="assets/images/EnglishFlag256px.png" alt="English flag"
+       (click)="goToBasicData(); switchLanguage('EN');"
+       (mouseover)="onMouseOver('Choose your language')"
+       (mouseout)="onMouseOut()">
+  <img src="assets/images/SpanishFlag256px.png" alt="Spanish flag"
+       (click)="goToBasicData(); switchLanguage('ES');"
+       (mouseover)="onMouseOver('Selecciona lenguaje')"
+       (mouseout)="onMouseOut()">
+</div>

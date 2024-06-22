@@ -1,0 +1,30 @@
+<form [formGroup]="basicDataForm" (ngSubmit)="goToContractType()">
+  <div>
+    <label for="companyName">Nombre de la empresa</label>
+    <input id="companyName" formControlName="companyName" type="text">
+  </div>
+
+  <div>
+    <label for="userName">{{ getTranslation('USERNAME') }}</label>
+    <input id="userName" formControlName="userName" type="text">
+    <div *ngIf="basicDataForm.get('userName')?.invalid && basicDataForm.get('userName')?.touched">
+      User name is mandatory.
+    </div>
+  </div>
+
+  <div>
+    <label for="email">Correo electrónico (Obligatorio)</label>
+    <input id="email" formControlName="email" type="email">
+    <div *ngIf="basicDataForm.get('email')?.invalid && basicDataForm.get('email')?.touched">
+      <div *ngIf="basicDataForm.get('email')?.errors?.['required']">E-mail is mandatory.</div>
+      <div *ngIf="basicDataForm.get('email')?.errors?.['email']">E-mail is not valid.</div>
+    </div>
+  </div>
+
+  <div>
+    <label for="phone">Teléfono</label>
+    <input id="phone" formControlName="phone" type="text">
+  </div>
+
+  <button type="submit" [disabled]="basicDataForm.invalid">Next!</button>
+</form>

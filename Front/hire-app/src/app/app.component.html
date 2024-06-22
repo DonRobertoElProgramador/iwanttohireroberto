@@ -1,0 +1,15 @@
+<div class="container">
+  <div class="content" [@slideInOut]="currentPage">
+    <ng-container *ngIf="currentPage === 'LANGUAGE-SELECTOR'">
+      <language-selector
+        (showBasicData)="showPage('BASIC-DATA')">
+      </language-selector>
+    </ng-container>
+    <ng-container *ngIf="currentPage === 'BASIC-DATA'">
+      <basic-data (showContractType)="showPage('CONTRACT-TYPE')"></basic-data>
+    </ng-container>
+    <ng-container *ngIf="currentPage === 'CONTRACT-TYPE'">
+      <contract-type></contract-type>
+    </ng-container>
+  </div>
+</div>
