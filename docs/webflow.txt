@@ -1,0 +1,36 @@
+1. Home page:
+Description: Language Selection.
+Component: language-selector
+NEXT->
+2. Basic data:
+Description: Basic Data.
+Component: basic-data
+NEXT->
+3. Contract type:
+Description: Contract Type.
+Component: contract-type
+NEXT->
+4. Offer description:
+Description: Offer Description.
+Component: offer-description
+NEXT->
+5. Working place:
+Description: Working Place.
+Component: working-place
+IF(FREELANCE)->6a
+IF(SALARIED)->6b
+6a. Salary Offer Freelance
+Description: Salary Offer Freelance.
+Component: salary-offer-freelance
+6b. Salary Offer Salaried
+Description: Salary Offer Salaried.
+Component: salary-offer-salaried
+RESULT OF REQUEST:
+IF(DENIED)->7a
+IF(PENDING)->7b
+7a. Result not interested
+Description: Result not interested.
+Component: result-notinterested
+7b. Result notified
+Description: Result notified.
+Component: result-notified

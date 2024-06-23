@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { TranslationService } from '../../services/translation.service';
 
 
@@ -10,5 +10,12 @@ import { TranslationService } from '../../services/translation.service';
   styleUrl: './contract-type.component.scss'
 })
 export class ContractTypeComponent {
+
+   @Output() showOfferDescription = new EventEmitter<void>();
+
+   goToShowOfferDescription() {
+    this.showOfferDescription.emit();
+   }
+
   constructor(private translationService: TranslationService) {}
 }

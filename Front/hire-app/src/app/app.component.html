@@ -6,10 +6,45 @@
       </language-selector>
     </ng-container>
     <ng-container *ngIf="currentPage === 'BASIC-DATA'">
-      <basic-data (showContractType)="showPage('CONTRACT-TYPE')"></basic-data>
+      <basic-data
+        (showContractType)="showPage('CONTRACT-TYPE')">
+      </basic-data>
     </ng-container>
     <ng-container *ngIf="currentPage === 'CONTRACT-TYPE'">
-      <contract-type></contract-type>
+      <contract-type
+        (showOfferDescription)="showPage('OFFER-DESCRIPTION')">
+      </contract-type>
+    </ng-container>
+    <ng-container *ngIf="currentPage === 'OFFER-DESCRIPTION'">
+      <offer-description
+        (showWorkingPlace)="showPage('WORKING-PLACE')">
+      </offer-description>
+    </ng-container>
+    <ng-container *ngIf="currentPage === 'WORKING-PLACE'">
+      <working-place
+        (showSalaryOfferSalaried)="showPage('SALARY-OFFER-SALARIED')"
+        (showSalaryOfferFreelance)="showPage('SALARY-OFFER-FREELANCE')">
+      </working-place>
+    </ng-container>
+    <ng-container *ngIf="currentPage === 'SALARY-OFFER-SALARIED'">
+      <salary-offer-salaried
+        (showResultNotified)="showPage('RESULT-NOTIFIED')"
+        (showResultNotInterested)="showPage('RESULT-NOTINTERESTED')">
+      </salary-offer-salaried>
+    </ng-container>
+    <ng-container *ngIf="currentPage === 'SALARY-OFFER-FREELANCE'">
+      <salary-offer-freelance
+        (showResultNotified)="showPage('RESULT-NOTIFIED')"
+        (showResultNotInterested)="showPage('RESULT-NOTINTERESTED')">
+      </salary-offer-freelance>
+    </ng-container>
+    <ng-container *ngIf="currentPage === 'RESULT-NOTINTERESTED'">
+      <result-notinterested>
+      </result-notinterested>
+    </ng-container>
+    <ng-container *ngIf="currentPage === 'RESULT-NOTIFIED'">
+      <result-notified>
+      </result-notified>
     </ng-container>
   </div>
 </div>
